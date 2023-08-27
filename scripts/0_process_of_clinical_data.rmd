@@ -1,0 +1,35 @@
+---
+title: "SNPs data preprocessing"
+author: "Shuai, Yi"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+# Add required packages
+  library(ggplot2)
+  library(tidyverse)
+  library(hrbrthemes)
+  library("stringr")
+  library(ComplexHeatmap)
+```
+
+# 1. Basic clincial characteristics
+```{r}
+  clinical.table = read.csv(paste0("./data/0_list_processed.csv"))
+  colnames(clinical.table)
+  mean(clinical.table$Age)
+  sd(clinical.table$Age)
+  sum(clinical.table$Gender == 1)
+  sum(clinical.table$Gender == 2)
+  sum(clinical.table$Smoking == 1)
+  sum(clinical.table$Smoking == 0)
+  for (i in 5:12) {
+    print(colnames(clinical.table)[i])
+    print(sum(clinical.table[,i] == 1))
+    print(sum(clinical.table[,i] == 1)/124)
+  }
+```
+
+
+
