@@ -14,60 +14,17 @@ output: html_document
   library(ComplexHeatmap)
 ```
 
-#------------------------------------------------------
-# 1. Preprocessing and basic stats of SNPs and CNV data 
-#------------------------------------------------------
-
-```{r}
-# Preprocess the SNPs file
-if (file.exists("./data/0_raw/2_raw.snps.table.rds")) {
-  message("SNPs data merging, DONE!")
-} else {
-  files.snp = list.files("./data/0_raw/1_snp.cds_annot/")
-  n.samples = length(files.snp)
-  final.snps.table = NULL
-  dbSNP_ver = NULL
-  for (i in 1:n.samples) {
-    temp.id = sapply(strsplit(x = files.snp[i], split = "\\."), `[`, 1)
-    temp = read.csv(paste0("./data/0_raw/1_snp.cds_annot/",files.snp[i]))
-    dbSNP_ver = c(dbSNP_ver, colnames(temp)[10])
-    colnames(temp)[10] = "dbSNP_database"
-    temp$sample_id = temp.id
-    final.snps.table = rbind(final.snps.table, temp)
-  }
-  saveRDS(final.snps.table, file = "./data/0_raw/2_raw.snps.table.rds")
-  saveRDS(dbSNP_ver, file = "./data/0_raw/2_raw.snps.dbSNPver.rds")
-}
-
-# Preprocess the CNVs file
-if (file.exists("./data/0_raw/2_raw.cnv.table.rds")) {
-  message("CNAs data merging, DONE!")
-} else {
-  files.cnv = list.files("./data/0_raw/1_indel.cds_annot/")
-  n.samples = length(files.cnv)
-  final.cnv.table = NULL
-  dbSNP_ver = NULL
-  for (i in 1:n.samples) {
-    temp.id = sapply(strsplit(x = files.cnv[i], split = "\\."), `[`, 1)
-    temp = read.csv(paste0("./data/0_raw/1_indel.cds_annot/",files.cnv[i]))
-    dbSNP_ver = c(dbSNP_ver, colnames(temp)[10])
-    colnames(temp)[10] = "dbSNP_database"
-    temp$sample_id = temp.id
-    final.cnv.table = rbind(final.cnv.table, temp)
-  }
-  saveRDS(final.cnv.table, file = "./data/0_raw/2_raw.cnv.table.rds")
-  saveRDS(dbSNP_ver, file = "./data/0_raw/2_raw.cnv.dbSNPver.rds")
-}
+```{r fig.height=4, fig.width=7}
+# Read the raw data
+  raw.cnas.table = readRDS("../raw_wes_data/raw.indel.table.rds")
+  raw.snps.table = readRDS("../raw_wes_data/raw.snps.table.rds")
 ```
 
 #----------------------------------------------------
-# 2. Visualize basic stats of SNPs and clean the data
+# 1. Visualize basic stats of SNPs and clean the data
 #----------------------------------------------------
 
 ```{r fig.height=4, fig.width=7}
-# Read the raw data
-  raw.snps.table = readRDS("./data/0_raw/2_raw.snps.table.rds")
-  # raw.snps.table = final.snps.table
 # 1. filter based on population frequency  
   # write.csv(raw.snps.table[1:6,], file = "./1_examplary_table.csv")
   ExAC_EAS_Freq = as.numeric(raw.snps.table$ExAC_EAS)
@@ -154,7 +111,6 @@ if (file.exists("./data/0_raw/2_raw.cnv.table.rds")) {
 
 ```{r}
 # Read the raw data [55,099]
-  raw.cnas.table = readRDS("./data/0_raw/2_raw.cnv.table.rds")
   ExAC_EAS_Freq = as.numeric(raw.cnas.table$ExAC_EAS)
   X1000G_EAS_Freq=as.numeric(raw.cnas.table$X1000G_EAS)
   ExAC_EAS_Freq[is.na(ExAC_EAS_Freq)] = 0
@@ -531,32 +487,3 @@ attributes <- listAttributes(ensembl)
 
     dev.off()
 ```
-
-```{r}
-load("./data/1_final_recur_genes.RData")
-recurrent_vars[grep(pattern = "^MUC", x = recurrent_vars)]
-recurrent_vars
-```
-
-```{r}
-pre = c("TERT", "TERC", "OBFC1", "ATP11A", "TOLLIP", "DSP", "DPP9", "AKAP", "FAM13A", "SPPL2C", "PARN", "RTEL1", "SFTPA2", "SFTPC",
-        "HLA-DRB1", "HLA-DQB1", "HLA-DRB5", "HLA-A", "HLA-B", "HLA-H", "HLA-G", "HLA-DQA1", "HLA-L") 
-intersect(recurrent_vars, pre)
-```
-
-
-```{r}
-load(file = "./data/1_gsea_recur_genes.RData")
-ego@result
-ego@result
-```
-
-
-```{r}
-load("./data/2_DEseq_res.RData")
-data.frame(res)["MUC3A",]
-data.frame(res)["DNAH11",]
-```
-
-
-
